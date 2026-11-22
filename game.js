@@ -11,6 +11,8 @@ const player = {
     h: 32,
     speed: 280
 };
+const keys = {};
+let lastTime = 0;
 
 // Joonistame tausta
 function drawSpace() {
@@ -45,4 +47,47 @@ function draw() {
     drawPlayer();
 }
 
-draw();
+document.addEventListener("keydown", (event) => {
+    if (["ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
+        event.preventDefault();
+    }
+    keys[event.code] = true;
+});
+
+document.addEventListener("keyup", (event) => {
+    keys[event.code] = false;
+});
+
+window.addEventListener("blur", () => {
+    for (const code in keys) keys[code] = false;
+});
+
+
+function update(dt) {
+    if (keys.ArrowLeft || keys.KeyA) {
+        player.x -= player.speed * dt;
+    }
+
+    if (keys.ArrowRight || keys.KeyD) {
+        player.x += player.speed * dt;
+    }
+
+    player.x = Math.max(
+        0,
+        Math.min(width - player.w, player.x)
+    );
+}
+
+
+function loop(time) {
+    const dt = Math.min((time - lastTime) / 1000, 0.05);
+    lastTime = time;
+
+    update(dt);
+    draw();
+
+    requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+
