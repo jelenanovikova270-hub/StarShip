@@ -21,6 +21,9 @@ let enemyTimer = 0;
 
 let score = 0;
 
+let lives = 3;
+let gameOver = false;
+let paused = false;
 
 function overlaps(a, b) {
     return a.x < b.x + b.w &&
@@ -82,12 +85,48 @@ ctx.fillStyle = "#e4f7ff";
 ctx.font = "18px monospace";
 ctx.fillText("PUNKTID: " + score, 18, 30);
 
+ctx.fillText("ELUD: " + lives, 18, 55);
+
+if (gameOver) {
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "36px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("MÄNG LÄBI!", width / 2, height / 2);
+    ctx.textAlign = "left";
+}
+
+if (paused && !gameOver) {
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "36px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("PAUS", width / 2, height / 2);
+    ctx.textAlign = "left";
+}
+
 }
 
 document.addEventListener("keydown", (event) => {
     if (["ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
         event.preventDefault();
     }
+
+
+if (event.code === "KeyP" && !event.repeat && !gameOver) {
+    paused = !paused;
+}
+if (event.code === "KeyR" && gameOver && !event.repeat) {
+    score = 0;
+    lives = 3;
+    gameOver = false;
+    paused = false;
+    bullets = [];
+    enemies = [];
+    shotTimer = 0;
+    enemyTimer = 0;
+    player.x = width / 2 - player.w / 2;
+    player.y = height - 64;
+}
+
     keys[event.code] = true;
 });
 
@@ -163,6 +202,17 @@ for (let i = enemies.length - 1; i >= 0; i--) {
         }
     }
 }
+
+for (let i = enemies.length - 1; i >= 0; i--) {
+    if (overlaps(player, enemies[i])) {
+        enemies.splice(i, 1);
+        lives -= 1;
+
+        if (lives <= 0) {
+            gameOver = true;
+        }
+    }
+}
   
 }
 
@@ -171,7 +221,11 @@ function loop(time) {
     const dt = Math.min((time - lastTime) / 1000, 0.05);
     lastTime = time;
 
+   
+if (!gameOver && !paused) {
     update(dt);
+}
+ 
     draw();
 
     requestAnimationFrame(loop);
