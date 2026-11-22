@@ -13,6 +13,9 @@ const player = {
 };
 const keys = {};
 let lastTime = 0;
+let bullets = [];
+let shotTimer = 0;
+
 
 // Joonistame tausta
 function drawSpace() {
@@ -28,7 +31,8 @@ function drawSpace() {
 }
 
 // Joonistame kosmoselaeva
-function drawPlayer() {
+function drawPlayer() 
+{
     ctx.fillStyle = "#73eed8";
     ctx.fillRect(player.x + 12, player.y, 8, 8);
     ctx.fillRect(player.x + 8, player.y + 8, 16, 16);
@@ -45,6 +49,11 @@ function drawPlayer() {
 function draw() {
     drawSpace();
     drawPlayer();
+ctx.fillStyle = "#ffdc83";
+for (const bullet of bullets) {
+    ctx.fillRect(bullet.x, bullet.y, bullet.w, bullet.h);
+}
+
 }
 
 document.addEventListener("keydown", (event) => {
@@ -75,7 +84,28 @@ function update(dt) {
     player.x = Math.max(
         0,
         Math.min(width - player.w, player.x)
-    );
+);
+
+shotTimer -= dt;
+
+if (keys.Space && shotTimer <= 0) {
+    bullets.push({
+        x: player.x + 14,
+        y: player.y,
+        w: 4,
+        h: 14
+    });
+    shotTimer = 0.22;
+}
+
+for (const bullet of bullets) {
+    bullet.y -= 430 * dt;
+}
+
+bullets = bullets.filter(
+    (bullet) => bullet.y + bullet.h > 0
+);
+   
 }
 
 
@@ -87,6 +117,7 @@ function loop(time) {
     draw();
 
     requestAnimationFrame(loop);
+
 }
 
 requestAnimationFrame(loop);
