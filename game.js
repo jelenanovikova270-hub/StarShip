@@ -16,6 +16,10 @@ let lastTime = 0;
 let bullets = [];
 let shotTimer = 0;
 
+let enemies = [];
+let enemyTimer = 0;
+
+
 
 // Joonistame tausta
 function drawSpace() {
@@ -52,6 +56,17 @@ function draw() {
 ctx.fillStyle = "#ffdc83";
 for (const bullet of bullets) {
     ctx.fillRect(bullet.x, bullet.y, bullet.w, bullet.h);
+
+}
+
+for (const enemy of enemies) {
+    ctx.fillStyle = "#ff6888";
+    ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h - 6);
+    ctx.fillRect(enemy.x - 3, enemy.y + 5, 34, 8);
+
+    ctx.fillStyle = "#080d22";
+    ctx.fillRect(enemy.x + 5, enemy.y + 8, 5, 5);
+    ctx.fillRect(enemy.x + 18, enemy.y + 8, 5, 5);
 }
 
 }
@@ -75,8 +90,7 @@ window.addEventListener("blur", () => {
 function update(dt) {
     if (keys.ArrowLeft || keys.KeyA) {
         player.x -= player.speed * dt;
-    }
-
+}
     if (keys.ArrowRight || keys.KeyD) {
         player.x += player.speed * dt;
     }
@@ -105,7 +119,27 @@ for (const bullet of bullets) {
 bullets = bullets.filter(
     (bullet) => bullet.y + bullet.h > 0
 );
-   
+ 
+enemyTimer -= dt;
+
+if (enemyTimer <= 0) {
+    enemies.push({
+        x: Math.random() * (width - 28),
+        y: -28,
+        w: 28,
+        h: 28
+    });
+    enemyTimer = 0.9;
+}
+
+for (const enemy of enemies) {
+    enemy.y += 110 * dt;
+}
+
+enemies = enemies.filter(
+    (enemy) => enemy.y < height
+);
+  
 }
 
 
