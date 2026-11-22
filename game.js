@@ -19,6 +19,15 @@ let shotTimer = 0;
 let enemies = [];
 let enemyTimer = 0;
 
+let score = 0;
+
+
+function overlaps(a, b) {
+    return a.x < b.x + b.w &&
+           a.x + a.w > b.x &&
+           a.y < b.y + b.h &&
+           a.y + a.h > b.y;
+}
 
 
 // Joonistame tausta
@@ -68,6 +77,10 @@ for (const enemy of enemies) {
     ctx.fillRect(enemy.x + 5, enemy.y + 8, 5, 5);
     ctx.fillRect(enemy.x + 18, enemy.y + 8, 5, 5);
 }
+
+ctx.fillStyle = "#e4f7ff";
+ctx.font = "18px monospace";
+ctx.fillText("PUNKTID: " + score, 18, 30);
 
 }
 
@@ -139,6 +152,17 @@ for (const enemy of enemies) {
 enemies = enemies.filter(
     (enemy) => enemy.y < height
 );
+
+for (let i = enemies.length - 1; i >= 0; i--) {
+    for (let j = bullets.length - 1; j >= 0; j--) {
+        if (overlaps(enemies[i], bullets[j])) {
+            enemies.splice(i, 1);
+            bullets.splice(j, 1);
+            score += 10;
+            break;
+        }
+    }
+}
   
 }
 
